@@ -1,0 +1,92 @@
+
+library(tidyverse)
+library(readxl)
+library(wesanderson)
+library(plyr)
+library(latex2exp)
+library(ggplot2)
+library(ggridges)
+library(viridis)
+library(hrbrthemes)
+library(dplyr)
+library(lattice)
+library(RColorBrewer)
+library(viridisLite)
+library(tibble)
+library(tidyr)
+library(gridExtra)
+library(latticeExtra)
+library(gtable)
+
+library(ggcorrplot)
+
+
+TD <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/TD_H1N1.xls")
+AUCV <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/AUCV_H1N1.xls")
+AUCM <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/AUCM_H1N1.xls")
+AUCD <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/AUCD_H1N1.xls")
+growth_rate.HP <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/r_H1N1_HP.xls", col_names = "HP")
+growth_rate.LP <- read_excel("~/Desktop/DDE-macrophages/GlobalSensitivityAnalysis/case study_fit both/r_H1N1_LP.xls", col_names = "LP")
+
+
+
+upper.panel<-function(x, y){
+  points(x,y, pch = 15, col=c("lightblue1", "lightpink1"), cex = 0.7)
+  r <- round(cor(x,y), digits= 2)
+  txt <- paste0("R = ", r)
+  usr <- par("usr"); on.exit(par(usr)) # the argument passed to on.exit() is recorded without evaluation.
+  par(usr = c(0, 1, 0, 1)) # usr = c(x1, x2, y1, y2) 
+  text(3, 6, txt, cex = 3.5)
+}
+
+
+ 
+
+cor.map.HP <- data.frame(TD = TD$HP,
+                         AUCD = AUCD$HP,
+                         #r = growth_rate.HP$HP,
+                         AUCV = AUCV$HP,
+                         AUCM = AUCM$HP)
+
+
+
+cor.map.LP <- data.frame(TD = TD$LP,
+                         AUCD = AUCD$LP,
+                         #r =  growth_rate.LP$LP,
+                         AUCV = AUCV$LP,
+                         AUCM = AUCM$LP)
+
+
+
+pairs(cor.map.HP, 
+      labels = c("Max epithe- \n -lium loss",
+                 TeX("$AUC_D$"),
+                 #"Initial viral \n growth rate", 
+                 TeX("$AUC_V$"),
+                 TeX("$AUC_M$")),
+      main = "HP",
+      upper.panel = upper.panel, 
+      lower.panel = NULL,    
+      cex.main = 3,
+      cex.labels= 3,
+      log = "xy",
+      horOdd = TRUE)
+
+
+ 
+
+pairs(cor.map.LP, 
+      labels = c("Max epithe- \n -lium loss",
+                 TeX("$AUC_D$"),
+                 #"Initial viral \n growth rate", 
+                 TeX("$AUC_V$"),
+                 TeX("$AUC_M$")),
+      main = "LP",
+      upper.panel = upper.panel, 
+      lower.panel = NULL,    
+      cex.main = 3,
+      cex.labels= 3,
+      log = "xy")
+
+
+
