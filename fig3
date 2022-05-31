@@ -112,17 +112,38 @@ roles <- factor(c("1","2","3"),
 #   
 #   
 #   
-# TD.df3 <- data.frame(TD = c(TD.kappaF0$HP, TD.kappaF0$LP),
-#                        strain = rep(strain, each = len.para))
-#   ggplot(data = TD.df3 , aes(x = strain, y = TD, fill = strain)) + 
-#     geom_violin(stat = "ydensity", scale  = "width")+
-#     theme_minimal() + 
-#     scale_fill_brewer(palette="Dark2") + 
-#     #geom_boxplot(width=0.1) + 
-#     scale_y_continuous(limits = c(0,100),breaks=seq(0,100,by=20)) + 
-#     theme( plot.background=element_blank(),
-#            panel.border=element_blank())
-#   
+TD.df <- data.frame(TD = log10(c(TD$HP, TD$LP)),
+                       strain = rep(strain, each = len.para))
+
+my_comparisons  <- list( c("HP", "LP"))
+compare_means(TD ~ strain, data = TD.df3)
+
+p.TD <- ggplot(data = TD.df , aes(x = strain, y = TD, group = strain, fill = strain)) + 
+  geom_violin(position = dodge, scale = "width",width = .6) +
+  theme_minimal() + 
+  scale_fill_brewer(palette = rev("YlGnBu")) + 
+  geom_boxplot(width=.1, outlier.colour=NA, position = dodge,aes(group = strain),fill = "white") + 
+  stat_compare_means(label =  "p.signif",  comparisons = my_comparisons, symnum.args = symnum.args, size = 10) + 
+  theme(plot.background=element_blank(),
+        panel.border=element_blank(),
+        axis.text.x = element_text(size = 30, face = "bold", color = "black"), 
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 30, face = "bold", color = "black"), 
+        axis.title.y = element_text(size = 30,face = "bold", color = "black"),
+        plot.title = element_text(size = 30, face = "bold", color = "black", hjust = .5),
+        legend.position = "none", 
+        legend.title=element_blank(),
+        legend.text=element_blank(),
+        panel.grid.major = element_blank()) + 
+  scale_y_continuous(limits = c(-2.2,2.5),breaks=seq(-2,2,by=1),labels=c( "0.01%", "0.1%", "1%", "10%","100%") ) + 
+  scale_x_discrete(labels = c("HP","LP"))+
+  labs(title = "Max % of epithelium loss (H1N1)",y = TeX("$1-\\min(T+R)  /T_0 \\%$") )
+
+p.TD
+
+
+ 
+
 # 
 # 
 #   
@@ -163,7 +184,7 @@ TD.all <- data.frame(TD = log10(c(TD$HP,
                      group = rep(c("1","2","3","4","5","6"), each = len.para))
 head(TD.all)
 
-text.color = c("black", "black", "black")
+text.color = c("black", "tan3", "tan3")
 dodge <- position_dodge(width = 0.5)
 
 my_comparisons1 <- list( c("1", "2"), c("2", "3"), c("1", "3"),
@@ -174,7 +195,7 @@ compare_means(TD ~ group,data = TD.all)
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.01, 0.05, 1), symbols = c( "***", "**", "*", "ns"))
 
 p.TD <- ggplot(data = TD.all , aes(x = role, y = TD, fill = strain)) + 
-  geom_violin(position = dodge, scale = "width", aes(linetype = linetype)) +
+  geom_violin(position = dodge, scale = "width", aes(linetype = linetype, size = linetype)) +
   theme_minimal() + 
   scale_fill_brewer(palette = rev("YlGnBu")) + 
   geom_boxplot(width=.1, outlier.colour=NA, position = dodge,aes(group = interaction(role, strain)),fill = "white") + 
@@ -194,7 +215,9 @@ p.TD <- ggplot(data = TD.all , aes(x = role, y = TD, fill = strain)) +
 
 compare_means(TD ~ strain, group.by = "role", data = TD.all)
 p.TD +   stat_compare_means(aes(label = ..p.signif..), label.y = -3, symnum.args = symnum.args, size = 10) + 
-  scale_linetype(guide = 'none') 
+  scale_linetype(guide = 'none')   + 
+  scale_size_manual( guide = "none", values = c(1,1) )
+
 
 
  
